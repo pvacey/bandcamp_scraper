@@ -16,29 +16,14 @@ def get_tags():
 
 def get_album_links(tag):
     albums =[]
+    #loop through 10 pages of ablums for each tag
     for i in range(1,11):
-    #for i in range(1,2): # only do 1 page for testing purposes
         url = 'https://bandcamp.com/tag/'+tag+'?page='+str(i)
         tagpage= requests.get(url).text
+        #find all of the album links and append them to a list
         tmp = re.findall('href="(.+?)"\s+title',tagpage)
         for a in tmp:
             albums.append(a)
-            #albums.append(tmp[0])
-        time.sleep(2)
-    #print len(albums)
-    return albums
-
-def get_album_links_old(tag):
-    # replace this complex regex with just this 'href="(.+?)"\s+title'
-    albums =[]
-    for i in range(1,11):
-    #for i in range(1,2): # only do 1 page for testing purposes
-        url = 'https://bandcamp.com/tag/'+tag+'?page='+str(i)
-        tagpage= requests.get(url).text
-        tmp = re.findall('class="item ">[\W\w]+?(?=<a)([\W\w]+?)(?=<\/li)',tagpage)
-        for a in tmp:
-            a_link = re.findall('href="([^"]+)',a)
-            albums.append(a_link[0])
         time.sleep(2)
     return albums
 
@@ -72,13 +57,14 @@ def get_album_info(url):
         try:
             fileurl = 'http:'+track['file']['mp3-128']
         except:
-            print '    [ERROR] no file for this track'
+            #print '    [ERROR] no file for this track'
+            pass
         tracks.append({
             "trackno"   : trackno,
             "title"     : tracktitle,
             "url"       : fileurl
         })
-
+    #build the JSON object to store in the mongo collection
     album = {
         "artist" : artist,
         "title"  : albumtitle,
@@ -94,7 +80,6 @@ client = MongoClient()
 db = client.music
 
 tags = get_tags()
-#x = 0 #for testing only
 for tag in tags:
     #get all of the album links for this tag
     alllinks = get_album_links(tag)
@@ -112,7 +97,3 @@ for tag in tags:
 
     print 'Found '+str(len(alllinks))+' '+tag+' albums, attempted to add '+str(len(newlinks))
     print '-------------------------------'
-    #below for testing only
-    #x += 1
-    #if x == 3:
-    #    break
