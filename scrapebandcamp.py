@@ -54,6 +54,7 @@ def get_album_info(url):
     # grab all tags on the page
     tags = re.findall('bandcamp.com\/tag\/([^"]+)', html)
 
+    albumart = re.findall('\<a class=\"popupImage\" href=\"([^\"]+)"\>',html)[0]
     #print 'Album: '+albumtitle
     #print 'Artist: '+artist
 
@@ -81,8 +82,8 @@ def get_album_info(url):
         "title"  : albumtitle,
         "url"    : url,
         "tag"    : tags,
-        "tracks" : tracks
+        "tracks" : tracks,
+        "art"    : albumart
     }
     print ' + {} - {}'.format(album['artist'].encode('ascii', 'ignore'), album['title'].encode('ascii', 'ignore'))
     return album
-
